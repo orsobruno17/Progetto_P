@@ -5,12 +5,22 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.example.progetto_p.local.dao.UtenteDao
+import com.example.progetto_p.local.entity.CompilazioneUtente
+import com.example.progetto_p.local.entity.Domande
+import com.example.progetto_p.local.entity.OpzioniRisposta
+import com.example.progetto_p.local.entity.Questionari
+import com.example.progetto_p.local.entity.RispostaSelezionata
 import com.example.progetto_p.local.entity.Utenti
 import kotlin.jvm.java
 
 @Database(
-    entities = [Utenti::class],
-    version = 1
+    entities = [Utenti::class,
+        RispostaSelezionata::class,
+        Questionari::class,
+        OpzioniRisposta::class,
+        Domande::class,
+        CompilazioneUtente::class],
+    version = 2
 )
 abstract class AppDatabase : RoomDatabase() {
 
