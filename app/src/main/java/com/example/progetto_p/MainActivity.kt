@@ -9,17 +9,21 @@ import com.example.progetto_p.local.database.AppDatabase
 import com.example.progetto_p.local.repository.UtentiRepository
 import com.example.progetto_p.ui.screens.LoginScreen
 import com.example.progetto_p.ui.screens.MainNavGraph
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val database = AppDatabase.getDatabase(applicationContext)
+        val applicationScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        val database = AppDatabase.getDatabase(context = applicationContext, scope = applicationScope)
 
-        val repository = UtentiRepository(database.utenteDao())
+        //val repository = UtentiRepository(database.utenteDao())
 
         setContent {
-            MainNavGraph(repository = repository)
+            MainNavGraph(database = database)
         }
     }
 }

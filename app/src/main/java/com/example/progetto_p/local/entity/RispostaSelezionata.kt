@@ -6,24 +6,24 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 
-@Entity(tableName = "compilazioneUtente",
+@Entity(tableName = "rispostaSelezionata",
     foreignKeys = [
         ForeignKey(
             entity = CompilazioneUtente::class,
             parentColumns = ["id"],
-            childColumns = ["compilazione_id"],
+            childColumns = ["compilazioneId"],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = Domande::class,
             parentColumns = ["id"],
-            childColumns = ["domanda_id"],
+            childColumns = ["domandaId"],
             onDelete = ForeignKey.CASCADE
         ),
         ForeignKey(
             entity = OpzioniRisposta::class,
             parentColumns = ["id"],
-            childColumns = ["opzione_selezionata_id"],
+            childColumns = ["opzioneSelezionataId"],
             onDelete = ForeignKey.CASCADE
         )
     ],
