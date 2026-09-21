@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         val applicationScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-        val database = AppDatabase.getDatabase(context = applicationContext, scope = applicationScope)
+        val database = AppDatabase.getDatabase(context = applicationContext)
 
         //val repository = UtentiRepository(database.utenteDao())
 

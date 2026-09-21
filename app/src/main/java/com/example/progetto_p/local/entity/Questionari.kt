@@ -5,8 +5,8 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "questionari")
 data class Questionari (
-    @PrimaryKey(autoGenerate = false)
-    val id: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
     val titolo: String,
     val descrizione: String,
     val fasciaEta: String?,

@@ -18,7 +18,7 @@ import androidx.room.PrimaryKey
 data class Domande(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val questionarioId: String,
+    val questionarioId: Int,
     val testo: String,
     val categoria: String?,
     val ordine: Int,
