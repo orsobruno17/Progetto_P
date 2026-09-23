@@ -1,18 +1,26 @@
 package com.example.progetto_p.ui
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.progetto_p.local.entity.Utenti
 import com.example.progetto_p.local.repository.UtentiRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
+import java.security.MessageDigest
 
 class UtentiViewModel(
 private val repository: UtentiRepository
 ) : ViewModel() {
 
-    val items: Flow<List<Utenti>> = repository.items
+    var codiceFiscale by mutableStateOf("")
+    var nome by mutableStateOf("")
+    var cognome by mutableStateOf("")
+    var email by mutableStateOf("")
+    var password by mutableStateOf("")
 
     fun PasswordValida(password: String): Boolean{
         val num = password.any{it.isDigit()}
@@ -32,7 +40,8 @@ private val repository: UtentiRepository
                 Log.d("LOGIN_DEBUG", "La password non contiene almeno un numero e carattere speciale")
                 onResult(false)
             }else{
-                repository.addItem(codiceFiscale, nome, cognome, email, password)
+                val hash = password.toSHA256()
+                repository.addItem(codiceFiscale, nome, cognome, email, hash)
                 onResult(true)
             }
         }
@@ -43,7 +52,8 @@ private val repository: UtentiRepository
         val password = password.trim()
 
         viewModelScope.launch {
-            val user = repository.getItemByEmail( email, password)
+            val passwordHash = password.toSHA256()
+            val user = repository.getItemByEmail( email, passwordHash)
             if(user != null){
                 Log.d("LOGIN_DEBUG", "Utente trovato: Nome = ${user.nome}, Cognome = ${user.cognome}, Email = ${user.email}")
                 onResult(true)
@@ -52,6 +62,14 @@ private val repository: UtentiRepository
                 onResult(false)
             }
         }
+    }
+
+    private val SALT = "Password_ProgettoP_segreta"
+    //metodo per criptare la password
+    fun String.toSHA256(): String {
+        val input = this + SALT //concateno la password con il salt
+        val bytes = MessageDigest.getInstance("SHA-256").digest(input.toByteArray()) // creo la password criptata
+        return bytes.joinToString("") { "%02x".format(it) }
     }
 
 }

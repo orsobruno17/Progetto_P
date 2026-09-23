@@ -22,93 +22,96 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.core.app.NotificationCompat
+
 import androidx.navigation.NavController
 import com.example.progetto_p.R
 import com.example.progetto_p.ui.UtentiViewModel
+import java.security.MessageDigest
+
 
 @Composable
-fun RegistrazioneScreen(navController: NavController, viewModel: UtentiViewModel){
-    var codiceFiscale by remember {
-        mutableStateOf("")
-    }
-
-    var nome by remember {
-        mutableStateOf("")
-    }
-
-    var cognome by remember() {
-        mutableStateOf("")
-    }
-
-    var email by remember {
-        mutableStateOf("")
-    }
-
-    var password by remember() {
-        mutableStateOf("")
-    }
+fun RegistrazioneScreen(navController: NavController, viewModel: UtentiViewModel) {
 
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(painter = painterResource(id = R.drawable.login),contentDescription = "Login immagine", modifier = Modifier.size(100.dp) )
+        Image(
+            painter = painterResource(id = R.drawable.login),
+            contentDescription = "Login immagine",
+            modifier = Modifier.size(100.dp)
+        )
 
         Text(text = "Registrati", fontSize = 28.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(6.dp))
-        OutlinedTextField(value = codiceFiscale, onValueChange = {codiceFiscale = it}, label = {
-            Text(text = "Codice Fiscale")
-        })
+        OutlinedTextField(
+            value = viewModel.codiceFiscale,
+            onValueChange = { viewModel.codiceFiscale = it },
+            label = {
+                Text(text = "Codice Fiscale")
+            })
         Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(value = nome, onValueChange = {nome = it}, label = {
+        OutlinedTextField(value = viewModel.nome, onValueChange = { viewModel.nome = it }, label = {
             Text(text = "Nome")
         })
 
         Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(value = cognome, onValueChange = {cognome = it}, label = {
-            Text(text = "Cognome")
-        })
+        OutlinedTextField(
+            value = viewModel.cognome,
+            onValueChange = { viewModel.cognome = it },
+            label = {
+                Text(text = "Cognome")
+            })
 
         Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(value = email, onValueChange = {email = it}, label = {
-            Text(text = "Email address")
-        })
+        OutlinedTextField(
+            value = viewModel.email,
+            onValueChange = { viewModel.email = it },
+            label = {
+                Text(text = "Email address")
+            })
 
         Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(value = password, onValueChange = {password = it}, label = {
-            Text(text = "Password")
-        })
+        OutlinedTextField(
+            value = viewModel.password,
+            onValueChange = { viewModel.password = it },
+            label = {
+                Text(text = "Password")
+            })
 
         Spacer(modifier = Modifier.height(16.dp))
         var passwordError by remember { mutableStateOf(false) }
         var credenzialiMancate by remember { mutableStateOf(false) }
 
         Button(onClick = {
-            if (codiceFiscale.isBlank() || nome.isBlank() || cognome.isBlank() || email.isBlank() || password.isBlank()) {
+            if (viewModel.codiceFiscale.isBlank() || viewModel.nome.isBlank() || viewModel.cognome.isBlank() || viewModel.email.isBlank() || viewModel.password.isBlank()) {
                 println("hai dimenticato di inserire i dati")
                 credenzialiMancate = true
-            }else{
-            viewModel.registrazione(
-                codiceFiscale = codiceFiscale,
-                nome = nome,
-                cognome = cognome,
-                email = email,
-                password = password,
-                onResult = {esito ->
-                    if(esito){
-                        navController.navigate("QuestionarioSelez")
-                    }else{
-                        passwordError = true
-                        Log.d("LOGIN_DEBUG", "La password non contiene almeno un numero e carattere speciale")
+            } else {
+                viewModel.registrazione(
+                    codiceFiscale = viewModel.codiceFiscale,
+                    nome = viewModel.nome,
+                    cognome = viewModel.cognome,
+                    email = viewModel.email,
+                    password = viewModel.password,
+                    onResult = { esito ->
+                        if (esito) {
+                            navController.navigate("QuestionarioSelez")
+                        } else {
+                            passwordError = true
+                            Log.d(
+                                "LOGIN_DEBUG",
+                                "La password non contiene almeno un numero e carattere speciale"
+                            )
+                        }
                     }
-                }
-            )
+                )
             }
 
-        }){
+        }) {
             Text(text = "Registrati")
         }
         if (credenzialiMancate) {
@@ -127,7 +130,4 @@ fun RegistrazioneScreen(navController: NavController, viewModel: UtentiViewModel
         }
 
     }
-
-
-
 }

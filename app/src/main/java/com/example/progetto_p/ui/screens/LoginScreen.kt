@@ -28,13 +28,6 @@ import com.example.progetto_p.ui.UtentiViewModel
 
 @Composable
 fun LoginScreen(navController: NavController, viewModel: UtentiViewModel){
-    var email by remember {
-        mutableStateOf("")
-    }
-
-    var password by remember() {
-        mutableStateOf("")
-    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -50,15 +43,15 @@ fun LoginScreen(navController: NavController, viewModel: UtentiViewModel){
         Text(text = "Accedi al tuo account")
 
         Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(value = email , onValueChange = {
-            email = it
+        OutlinedTextField(value = viewModel.email , onValueChange = {
+            viewModel.email = it
         }, label = {
             Text(text = "Email address")
         })
 
         Spacer(modifier = Modifier.height(16.dp))
-        OutlinedTextField(value = password, onValueChange = {
-            password = it
+        OutlinedTextField(value = viewModel.password, onValueChange = {
+            viewModel.password = it
         }, label = {
             Text(text = "Password")
         }, visualTransformation = PasswordVisualTransformation())
@@ -69,20 +62,16 @@ fun LoginScreen(navController: NavController, viewModel: UtentiViewModel){
 
         Button(onClick = {
             loginError = false
-            if (email.isBlank() || password.isBlank()) {
+            if (viewModel.email.isBlank() || viewModel.password.isBlank()) {
                 println("hai dimenticato di inserire i dati")
                 credenzialiMancate = true
             } else {
                 viewModel.login(
-                    email = email,
-                    password = password,
+                    email = viewModel.email,
+                    password = viewModel.password,
                     onResult = { esitoPositivo ->
                         if (esitoPositivo) {
-                            navController.navigate("QuestionarioSelez") {
-                                // Cancella la schermata di login dal backstack,
-                                // così se l'utente preme "Indietro" dal tablet non torna al login
-                                popUpTo("Login") { inclusive = true }
-                            }
+                            navController.navigate("QuestionarioSelez")
                         } else {
                             loginError = true
                             Log.d("Login", "Email o password errate")
