@@ -4,8 +4,10 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.progetto_p.local.dao.CompilazioneDao
 import com.example.progetto_p.local.dao.DomandeDao
 import com.example.progetto_p.local.dao.QuestionariDao
+import com.example.progetto_p.local.dao.RisposteSelezDao
 import com.example.progetto_p.local.dao.UtenteDao
 import com.example.progetto_p.local.entity.CompilazioneUtente
 import com.example.progetto_p.local.entity.Domande
@@ -29,6 +31,10 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun utenteDao(): UtenteDao
     abstract fun questionarioDao(): QuestionariDao
+    abstract fun domandeDao(): DomandeDao
+    abstract fun risposteSelezionataDao(): RisposteSelezDao
+
+    abstract fun compilazioneDao(): CompilazioneDao
 
 
     companion object {
@@ -43,7 +49,7 @@ abstract class AppDatabase : RoomDatabase() {
                     "utenti_database"
                 )
                     .createFromAsset("database/questionari.db")
-                    .fallbackToDestructiveMigration() // permette di pulire il db in caso di modifiche allo schema
+                    //.fallbackToDestructiveMigration() // permette di pulire il db in caso di modifiche allo schema
                     .build()
 
                 INSTANCE = instance

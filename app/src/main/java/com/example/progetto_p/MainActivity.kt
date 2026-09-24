@@ -17,10 +17,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val applicationScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
         val database = AppDatabase.getDatabase(context = applicationContext)
-
-        //val repository = UtentiRepository(database.utenteDao())
 
         setContent {
             MainNavGraph(database = database)

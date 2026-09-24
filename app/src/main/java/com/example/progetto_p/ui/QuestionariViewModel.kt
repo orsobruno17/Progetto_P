@@ -2,6 +2,7 @@ package com.example.progetto_p.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.progetto_p.local.dao.QuestionariDao
 import com.example.progetto_p.local.entity.Questionari
 import com.example.progetto_p.local.repository.QuestionariRepository
@@ -20,4 +21,8 @@ class QuestionariViewModel (
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
         )
+
+    suspend fun getTitolo(id: Int): String? {
+        return repository.getTitolo(id)
+    }
 }

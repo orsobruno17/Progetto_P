@@ -1,6 +1,7 @@
 package com.example.progetto_p.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -31,14 +32,14 @@ import com.example.progetto_p.ui.theme.Navy
 
 @Composable
 fun QuestionarioSelz(navController: NavController, viewModel: QuestionariViewModel){
+    // riesce a leggere la lista di questionari aggiornata dal ViewModel
+    val questionariList by viewModel.items.collectAsStateWithLifecycle()
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
-        // riesce a leggere la lista di questionari aggiornata dal ViewModel
-        val questionariList by viewModel.items.collectAsStateWithLifecycle()
-
         Card(modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 10.dp)
             .fillMaxWidth(),
@@ -56,7 +57,7 @@ fun QuestionarioSelz(navController: NavController, viewModel: QuestionariViewMod
                     QuestionarioCard(
                         questionario = questionario,
                         onClick = {
- // QUI DEVI METTERE LA SCHERMATA DEL SINGOLO QUESTIONARIO navController.navigate("")
+                            navController.navigate("EseguiQuestionario/${questionario.id}")
                         }
 
                     )
@@ -74,10 +75,11 @@ fun QuestionarioCard(
     Column(
             modifier = Modifier
                 .background(Navy)
+                .clickable { onClick() }
                 .padding(16.dp)
         ) {
             Text(
-                text = questionario.id,
+                text = questionario.titolo,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 color = Color.White

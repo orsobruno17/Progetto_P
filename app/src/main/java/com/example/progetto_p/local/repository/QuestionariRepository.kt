@@ -9,4 +9,8 @@ class QuestionariRepository (
 ){
     val items: Flow<List<Questionari>> = dao.getAllItems()
 
+    suspend fun getTitolo(id: Int): String?{
+        return dao.getTitolo(id)
+    }
+
 }

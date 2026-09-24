@@ -12,15 +12,23 @@ import androidx.room.PrimaryKey
             parentColumns = ["id"],
             childColumns = ["questionarioId"],
             onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = Utenti::class,
+            parentColumns = ["codiceFiscale"],
+            childColumns = ["utenteId"],
+            onDelete = ForeignKey.CASCADE
         )
     ],
-    indices = [Index(value = ["questionarioId"])]
+    indices = [
+        Index(value = ["questionarioId"]),
+        Index(value = ["utenteId"])]
     )
 data class CompilazioneUtente(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
-    val utenteId: Int,
-    val questionarioId: String,
-    val punteggioTot: Int,
+    val utenteId: String,
+    val questionarioId: Int,
+    val punteggioTot: Int?,
     // val timestamp: Int
 )

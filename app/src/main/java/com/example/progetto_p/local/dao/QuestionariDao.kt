@@ -12,6 +12,9 @@ interface QuestionariDao {
     @Query("SELECT * FROM questionari")
     fun getAllItems(): Flow<List<Questionari>>
 
+    @Query("SELECT titolo FROM questionari WHERE id = :id")
+    suspend fun getTitolo(id: Int): String
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(questionario: Questionari)
 }
