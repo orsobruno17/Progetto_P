@@ -14,4 +14,20 @@ class CompilazioneRepository(
     fun getCompl(utenteId: String, questionarioId: Int): Flow<Int> {
         return dao.getCompl(utenteId, questionarioId)
     }
+
+    suspend fun sommaTotPunt(compilazioneId: Int): Int{
+       return dao.sommaTotPunt(compilazioneId)
+    }
+
+    suspend fun aggiornaPunteggioT(nuovoValore: Int, compilazioneId: Int){
+        dao.aggiornaPunteggioT(nuovoValore, compilazioneId)
+    }
+
+    fun getTotPunteggio(utenteId: String,questionarioId: Int): Flow<Int>{
+        return dao.getTotPunteggio(utenteId,questionarioId)
+    }
+
+    fun getRisultato(questionariId: Int, punteggio: Int): Flow<String>{
+        return dao.getRisultato(questionariId, punteggio)
+    }
 }

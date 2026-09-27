@@ -111,5 +111,34 @@ fun MainNavGraph(database: AppDatabase){
            )
 
         }
+
+        composable ( "OutputScreen/{questionarioId}", listOf(
+            navArgument("questionarioId"){
+                type = NavType.IntType
+            },
+            )){
+                backStackEntry ->
+            val questionarioId = backStackEntry.arguments?.getInt("questionarioId") ?: 0
+            //val nuovoValore = backStackEntry.arguments?.getInt("nuovoValore") ?: 0
+            val compilazioneDao = database.compilazioneDao()
+            val repository = CompilazioneRepository(compilazioneDao)
+            val factory = CompilazioneViewModelFactory(repository)
+
+            val viewModel: CompilazioneViewModel = viewModel(factory = factory)
+            val risposteDao = database.risposteSelezionataDao()
+            val risposteRepository = RisposteSelezRepository(risposteDao)
+            val risposteFactory = RisposteSelezViewModelFactory( risposteRepository,sessionManager)
+            val viewModelS: RisposteSelezViewModel = viewModel(factory = risposteFactory)
+
+
+            OutputScreen(
+                questionarioId = questionarioId,
+                //nuovoValore = nuovoValore,
+                navController = navController,
+                viewModel = viewModel,
+                viewModelS = viewModelS
+            )
+        }
+
     }
 }

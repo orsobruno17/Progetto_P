@@ -14,6 +14,7 @@ import com.example.progetto_p.local.entity.Domande
 import com.example.progetto_p.local.entity.OpzioniRisposta
 import com.example.progetto_p.local.entity.Questionari
 import com.example.progetto_p.local.entity.RispostaSelezionata
+import com.example.progetto_p.local.entity.Risultati
 import com.example.progetto_p.local.entity.Utenti
 
 @Database(
@@ -23,7 +24,8 @@ import com.example.progetto_p.local.entity.Utenti
         Questionari::class,
         OpzioniRisposta::class,
         Domande::class,
-        CompilazioneUtente::class
+        CompilazioneUtente::class,
+        Risultati::class
     ],
     version = 3
 )

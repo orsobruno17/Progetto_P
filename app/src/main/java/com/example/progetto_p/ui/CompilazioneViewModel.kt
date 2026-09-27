@@ -28,4 +28,20 @@ class CompilazioneViewModel(
             )
 
     }
+
+    suspend fun sommaTotPunt(compilazioneId: Int): Int{
+       return repository.sommaTotPunt(compilazioneId)
+    }
+
+    fun aggiornaPunteggioT(nuovoValore: Int, compilazioneId: Int){
+        viewModelScope.launch { repository.aggiornaPunteggioT(nuovoValore, compilazioneId)}
+    }
+
+    fun getTotPunteggio(utenteId: String,questionarioId: Int): Flow<Int>{
+        return repository.getTotPunteggio(utenteId,questionarioId)
+    }
+
+    fun getRisultato(questionariId: Int, punteggio: Int): Flow<String>{
+        return repository.getRisultato(questionariId,punteggio)
+    }
 }

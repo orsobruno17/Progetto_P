@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +48,7 @@ import com.example.progetto_p.ui.DomandeViewModel
 import com.example.progetto_p.ui.QuestionariViewModel
 import com.example.progetto_p.ui.RisposteSelezViewModel
 import com.example.progetto_p.ui.UtentiViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class) //lo devo mettere per avere la parte iniziale ferma
 @Composable
@@ -59,7 +61,7 @@ fun EseguiQuestionario(
     viewModelC: CompilazioneViewModel
 ){
     val context = LocalContext.current
-
+    val scope = rememberCoroutineScope()
     val domande by viewModel.domande.collectAsStateWithLifecycle()
 
     //qui metto tutte le risposte dell'utente con chiave =domanda.id e il valore= rispostaSelezionata
@@ -112,7 +114,7 @@ Column(modifier = Modifier
                  idRispostaSelezionata = risposteSelezionate[domanda.id],
                  onRispostaSelezionata = { rispostaId ->
                      risposteSelezionate = risposteSelezionate + (domanda.id to rispostaId)
-                     //QUI GLI PASSI IL VALORE DELLA COMPILAZIONE
+                     //QUI GLI PASSO IL VALORE DELLA COMPILAZIONE
                      if(compilazioneId > 0) {
                          viewModelS.salvaRispostaCompilata(compilazioneId, domanda.id, rispostaId)
                      }else{
@@ -140,7 +142,16 @@ Column(modifier = Modifier
             if (domande.size != risposteSelezionate.size) {
                 Toast.makeText(context, "Devi rispondere a tutte le domande", Toast.LENGTH_LONG).show()
             } else {
-                //L'UTENTE VA ALLA SCHERMATA CALCOLO
+                //QUI FACCIO LA SOMMA
+                scope.launch {
+                    val nuovoValore = viewModelC.sommaTotPunt(compilazioneId)
+                    Log.d("DEBUG","LA SOMMA VALE ${nuovoValore}")
+                    //INSERISCO IL TOTALE IN compilazioneUtente punteggio tot
+                    viewModelC.aggiornaPunteggioT(nuovoValore, compilazioneId)
+                    navController.navigate("OutputScreen/${questionarioId}")
+                    //navController.navigate("OutputScreen/${questionarioId}/\${nuovoValore}")
+                }
+
             }
         }) {
             Text(text = "Fine")
