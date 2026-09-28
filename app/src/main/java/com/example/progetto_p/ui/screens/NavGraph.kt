@@ -69,9 +69,16 @@ fun MainNavGraph(database: AppDatabase){
 
             val viewModel: QuestionariViewModel = viewModel(factory = factory)
 
+            val utenteDao = database.utenteDao()
+            val repositoryU = UtentiRepository(utenteDao)
+            val factoryU = UtentiViewModelFactory(repositoryU, sessionManager)
+
+            val viewModelU : UtentiViewModel = viewModel(factory = factoryU)
+
             QuestionarioSelz(
                 navController = navController,
-                viewModel = viewModel
+                viewModel = viewModel,
+                viewModelU = viewModelU
             )
         }
 

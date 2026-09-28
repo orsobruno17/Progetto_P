@@ -1,25 +1,44 @@
 package com.example.progetto_p.ui.screens
 
+import android.R
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.anchoredDraggable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MediumTopAppBar
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,43 +47,69 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.progetto_p.local.entity.Questionari
 import com.example.progetto_p.ui.QuestionariViewModel
-import com.example.progetto_p.ui.theme.Navy
-
+import com.example.progetto_p.ui.UtentiViewModel
+import com.example.progetto_p.ui.theme.background
+import com.example.progetto_p.ui.theme.primary
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun QuestionarioSelz(navController: NavController, viewModel: QuestionariViewModel){
+fun QuestionarioSelz(navController: NavController, viewModel: QuestionariViewModel, viewModelU: UtentiViewModel){
     // riesce a leggere la lista di questionari aggiornata dal ViewModel
     val questionariList by viewModel.items.collectAsStateWithLifecycle()
 
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ){
-        Card(modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 10.dp)
-            .fillMaxWidth(),
-            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)){
-
-            Text(text = "Seleziona il tuo questionario", fontSize = 28.sp, fontWeight = FontWeight.Bold)
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.fillMaxWidth().weight(1f)
-            ) {
-                items(questionariList) { questionario ->
-                    QuestionarioCard(
-                        questionario = questionario,
-                        onClick = {
-                            navController.navigate("EseguiQuestionario/${questionario.id}")
-                        }
-
-                    )
-                }
-            }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {Text(text = "Seleziona Questionario",
+                    fontSize = 50.sp,
+                    color = MaterialTheme.colorScheme.onSecondary)},
+                actions = {
+                    TextButton(
+                        onClick = { viewModelU.logout() },
+                        colors = ButtonDefaults.buttonColors(
+                            MaterialTheme.colorScheme.onBackground //colore dello sfondo
+                        )
+                    ){
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                                contentDescription = "Logout",
+                                tint = MaterialTheme.colorScheme.onSecondary
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = " Logout",
+                                color = MaterialTheme.colorScheme.onSecondary
+                            )
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary
+                )
+            )
         }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier.fillMaxSize().padding(innerPadding)
+                .background(MaterialTheme.colorScheme.tertiary)
+            ){
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        items(questionariList) { questionario ->
+                            QuestionarioCard(
+                                questionario = questionario,
+                                onClick = {
+                                    navController.navigate("EseguiQuestionario/${questionario.id}")
+                                }
 
+                            )
+                        }
+                    }
+
+
+            }
     }
 }
 @Composable
@@ -72,23 +117,25 @@ fun QuestionarioCard(
     questionario: Questionari,
     onClick: () -> Unit
 ){
-    Column(
-            modifier = Modifier
-                .background(Navy)
-                .clickable { onClick() }
-                .padding(16.dp)
+    Card(
+        modifier = Modifier
+            .clickable { onClick() },
+            colors = CardDefaults.cardColors(
+                containerColor = primary
+            ),
+            border = BorderStroke(10.dp, MaterialTheme.colorScheme.onBackground),
         ) {
+        Column(modifier = Modifier.padding(24.dp)) {
             Text(
                 text = questionario.titolo,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSecondary
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = questionario.descrizione,
-                fontSize = 14.sp,
-                color = Color.White
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSecondary
             )
             Spacer(modifier = Modifier.height(12.dp))
 
@@ -96,28 +143,30 @@ fun QuestionarioCard(
                 eta ->
                 Text(
                     text = "Fascia età: $eta",
-                    fontSize = 12.sp,
-                    color = Color.White
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSecondary
                 )
             }
+            Spacer(modifier = Modifier.height(12.dp))
 
             questionario.tempoCompletamento?.let{
                     tempo ->
                 Text(
                     text = "Tempo di completamento: $tempo",
-                    fontSize = 12.sp,
-                    color = Color.White
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSecondary
                 )
             }
-
+            Spacer(modifier = Modifier.height(12.dp))
             questionario.frequenzaUso?.let{
                     frequenza ->
                 Text(
                     text = "Frequenza d'uso: $frequenza",
-                    fontSize = 12.sp,
-                    color = Color.White
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSecondary
                 )
             }
         }
+    }
     }
 

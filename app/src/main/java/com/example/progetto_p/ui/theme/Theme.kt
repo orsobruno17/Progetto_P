@@ -12,40 +12,41 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Navy,
+    primary = Purple40,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Purple80
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = primary,
+    secondary = background,
+    tertiary = tertiary,
+    //background = background,
+    //surface = Color(0xFFFFFBFE),
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+    //on serve per i testi
+    onPrimary = testoN,
+    onSecondary = testoB,
+    //onSecondary = Color.White,
+    //onTertiary = Color.White,
+    onBackground = background,
+    //onSurface = Color(0xFF1C1B1F),
+
 )
 
 @Composable
 fun Progetto_PTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    //dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+        /*dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
+        }*/
+        //darkTheme rileva se l'app è in tema scuro o chiaro
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }

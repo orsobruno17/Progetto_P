@@ -40,23 +40,35 @@ private val repository: UtentiRepository,
 
         return num && carattere
     }
-    fun registrazione(codiceFiscale : String, nome: String, cognome : String, email : String, password: String, onResult:(Boolean) -> Unit) {
+
+    fun CFValido(codiceFiscale: String): Boolean{
+        val cf = codiceFiscale.uppercase().trim()
+
+        val regex = "^[A-Z]{6}[0-9]{2}[A-Z][0-9]{2}[A-Z][0-9]{3}[A-Z]$".toRegex()
+        if (!regex.matches(cf)){
+            return false}
+        return true
+    }
+    fun registrazione(codiceFiscale : String, nome: String, cognome : String, email : String, password: String, onResult:(esito: Boolean, erroreCF: Boolean, errorePassword: Boolean) -> Unit) {
         val codiceFiscale = codiceFiscale.trim()
         val nome = nome.trim()
         val cognome = cognome.trim()
         val email = email.trim()
         val password = password.trim()
 
+        val cf = CFValido(codiceFiscale)
+        val passw = PasswordValida(password)
+
+
+        if (!cf || !passw) {
+            onResult(false, !cf, !passw)
+            return
+        }
         viewModelScope.launch {
-            if(!PasswordValida(password)){
-                Log.d("LOGIN_DEBUG", "La password non contiene almeno un numero e carattere speciale")
-                onResult(false)
-            }else{
                 val hash = password.toSHA256()
                 repository.addItem(codiceFiscale, nome, cognome, email, hash)
                 sessionManager.salvaSessione(codiceFiscale)
-                onResult(true)
-            }
+                onResult(true, false, false)
         }
     }
 
