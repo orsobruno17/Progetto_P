@@ -1,13 +1,20 @@
 package com.example.progetto_p.ui.screens
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,41 +31,10 @@ import com.example.progetto_p.ui.RisposteSelezViewModel
 @Composable
 fun OutputScreen(
     questionarioId: Int,
-    //nuovoValore: Int,
     navController: NavController,
     viewModel: CompilazioneViewModel,
     viewModelS: RisposteSelezViewModel
 ){
-    /*val codiceFiscaleUser by viewModelS.utenteLog.collectAsStateWithLifecycle()
-    val punteggio by  viewModel.getTotPunteggio(codiceFiscaleUser?: "", questionarioId).collectAsStateWithLifecycle(initialValue = -1)
-    Log.d("DEBUG", "Punteggio: ${punteggio}")
-    val testoRisul by viewModel.getRisultato(questionarioId, punteggio).collectAsStateWithLifecycle(initialValue = "Caricamento..")
-
-    if (codiceFiscaleUser == null || punteggio == -1) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-    }else{
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ){
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(text = "Punteggio: $punteggio")
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(text = testoRisul ?: "Nessun risultato disponibile per questo punteggio")
-            }
-        }
-    }
-
-*/
-    // 1. Leggi l'utente loggato
     val codiceFiscaleUser by viewModelS.utenteLog.collectAsStateWithLifecycle()
     //val punteggio = nuovoValore
     val punteggio by if (codiceFiscaleUser != null) {
@@ -69,7 +45,6 @@ fun OutputScreen(
     }
     Log.d("DEBUG PUNTEGGIO", "Punteggio: ${punteggio}")
 
-    // 3. Raccogli il risultato SOLO quando il punteggio è stato recuperato dal DB (non è null)
     val testoRisul by if (punteggio != null) {
         viewModel.getRisultato(questionarioId, punteggio!!)
             .collectAsStateWithLifecycle(initialValue = "Caricamento esito...")
@@ -77,7 +52,6 @@ fun OutputScreen(
         remember { mutableStateOf(null) }
     }
 
-    // 4. Renderizza la UI in base allo stato dei dati
     if (codiceFiscaleUser == null || punteggio == null) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -86,18 +60,40 @@ fun OutputScreen(
             CircularProgressIndicator()
         }
     } else {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
+                modifier = Modifier.background(MaterialTheme.colorScheme.primary)
+                    .fillMaxSize()
+                    .padding(16.dp)
             ) {
-                Text(text = "Punteggio: $punteggio")
+                Text(text = "Questionario Completato",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSecondary)
+
+                Spacer(modifier = Modifier.padding(10.dp))
+
+                Text(text = "Punteggio: $punteggio",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSecondary)
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = testoRisul ?: "Nessun risultato disponibile per questo punteggio")
+                Text(text = testoRisul ?: "Nessun risultato disponibile per questo punteggio",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSecondary
+                    )
+
+                Spacer(modifier = Modifier.padding(10.dp))
+                Button(onClick = {
+                    navController.navigate("QuestionarioSelez")
+                }, modifier = Modifier.defaultMinSize(minWidth = 80.dp),
+                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        MaterialTheme.colorScheme.onBackground)) {
+                    Text(text = "Torna alla HomePage",
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSecondary)
+                }
             }
-        }
+
     }
 }
