@@ -15,15 +15,20 @@ private const val USER = "user_codicefiscale"
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = USER)
 
 class SessionManager(private val context: Context) {
+    //rappresenta il pacchetto
     private object PreferencesKeys{
+        //ci metto una chiave dove salverò il codicefiscale dell'utente
         val codiceFiscale = stringPreferencesKey("codiceFiscale_utente")
     }
 
+    //qui apro il pacchetto e cerco il codicefiscale tramite .map
     val codiceFiscaleFlow: Flow<String?> = context.dataStore.data
+        //se ci sono erroir di lettura restituisce nell
         .catch { exception ->
             if(exception is IOException){
                 emit(emptyPreferences())
             }else{
+                //se sono altri tipi di errori allora lancia errore
                 throw exception
             }
         }
@@ -31,6 +36,8 @@ class SessionManager(private val context: Context) {
             preferences ->
             preferences[PreferencesKeys.codiceFiscale]
         }
+
+    //serve per memorizzare il codicefiscale nella memoria del dispositivo
     suspend fun salvaSessione(codiceFiscale: String){
         context.dataStore.edit{
             preferences ->

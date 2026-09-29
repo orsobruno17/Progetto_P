@@ -1,8 +1,11 @@
 package com.example.progetto_p.ui.screens
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -34,7 +37,6 @@ fun MainNavGraph(database: AppDatabase){
     val navController = rememberNavController()
     val repository = UtentiRepository(database.utenteDao())
     val sessionManager = SessionManager(LocalContext.current)
-
 
     NavHost(navController = navController, startDestination = "HomeScreen"){
         composable("HomeScreen"){

@@ -26,6 +26,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -49,7 +50,10 @@ fun QuestionarioSelz(navController: NavController, viewModel: QuestionariViewMod
                     color = MaterialTheme.colorScheme.onSecondary)},
                 actions = {
                     TextButton(
-                        onClick = { viewModelU.logout() },
+                        onClick = { viewModelU.logout()
+                                navController.navigate("LoginScreen") {
+                                popUpTo(0) { inclusive = true }
+                            }},
                         colors = ButtonDefaults.buttonColors(
                             MaterialTheme.colorScheme.onBackground //colore dello sfondo
                         )
