@@ -139,7 +139,7 @@ fun LoginScreen(navController: NavController, viewModel: UtentiViewModel){
             navController.navigate("Registrati")
         },
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onPrimary
+            color = MaterialTheme.colorScheme.onSecondary
             )
 
     }

@@ -10,11 +10,20 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import com.example.progetto_p.ui.theme.testoN
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey80,
-    tertiary = Purple80
+    primary = primaryDark,
+    secondary = backgroundDark,
+    tertiary = tertiaryDark,
+
+    //on serve per i testi
+    onPrimary = testoNDark,
+    onSecondary = testoBDark,
+    //onSecondary = Color.White,
+    //onTertiary = Color.White,
+    onBackground = backgroundDark,
+    //onSurface = Color(0xFF1C1B1F)
 )
 
 private val LightColorScheme = lightColorScheme(
