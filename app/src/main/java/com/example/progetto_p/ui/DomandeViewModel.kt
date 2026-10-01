@@ -21,17 +21,11 @@ class DomandeViewModel (
 
 
     //estraggo l'id dall'argomento della navigazione
-    private val questionarioId: Int = checkNotNull(savedStateHandle.get<Int>("questionarioId"))
+    //private val questionarioId: Int = checkNotNull(savedStateHandle.get<Int>("questionarioId"))
 
-
-    val domande: StateFlow<List<Domande>> = repository
-        .getDomandeById(questionarioId)
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
-
+    fun getDomandeById(questionarioId: Int): Flow<List<Domande>>{
+        return repository.getDomandeById(questionarioId)
+    }
     fun risposte(domandaId: Int): Flow<List<OpzioniRisposta>> {
         return repository.getRisposte(domandaId)
     }

@@ -35,9 +35,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -65,20 +64,18 @@ fun EseguiQuestionario(
     viewModelC: CompilazioneViewModel
 ){
     val context = LocalContext.current
+
     val scope = rememberCoroutineScope()
-    val domande by viewModel.domande.collectAsStateWithLifecycle()
+
+    val domande by viewModel.getDomandeById(questionarioId)
+        .collectAsStateWithLifecycle(initialValue = emptyList())
 
     //qui metto tutte le risposte dell'utente con chiave =domanda.id e il valore= rispostaSelezionata
-    var risposteSelezionate by remember { mutableStateOf<Map<Int, Int>>(emptyMap()) }
-
-    //permette di caricare il valore in background
-    /*val titoloQuestionario by produceState(initialValue = "Caricamento...", key1 = questionarioId) {
-        value = (viewModelQ.getTitolo(questionarioId) ?: "Titolo non disponibile")
-    }*/
+    var risposteSelezionate by rememberSaveable { mutableStateOf<Map<Int, Int>>(emptyMap()) }
 
     //da questo prendo il codice e di conseguenza l'id (forse devo fare una query per farmi ritornare l'id)
     //serve per la tabella compilazione
-    val codiceFiscaleUser by viewModelS.utenteLog.collectAsStateWithLifecycle()
+    val codiceFiscaleUser by viewModelS.utenteLog.collectAsStateWithLifecycle(initialValue = null)
 
     if (codiceFiscaleUser == null) {
         Box(
@@ -90,13 +87,23 @@ fun EseguiQuestionario(
         return
     }
     //recupero l'id della compilazione
-    val compilazioneId by viewModelC.getCompl(codiceFiscaleUser!!, questionarioId).collectAsStateWithLifecycle(initialValue = 0)
+    val compilazioneId by viewModelC.getCompl(codiceFiscaleUser!!, questionarioId).collectAsStateWithLifecycle(initialValue = -1)
 
     //il LauchedEffect permette di creare la compilazione solo una volta, anche se c'è una ricomposizione
-    LaunchedEffect(codiceFiscaleUser, questionarioId) {
+    LaunchedEffect(codiceFiscaleUser, questionarioId, compilazioneId) {
         if (compilazioneId == 0) {
             viewModelC.inserisciCompil(codiceFiscaleUser!!, questionarioId)
         }
+    }
+
+    if (compilazioneId <= 0) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
     }
 
     Scaffold(
@@ -171,7 +178,11 @@ fun EseguiQuestionario(
                             Log.d("DEBUG","LA SOMMA VALE ${nuovoValore}")
                             //INSERISCO IL TOTALE IN compilazioneUtente punteggio tot
                             viewModelC.aggiornaPunteggioT(nuovoValore, compilazioneId)
-                            navController.navigate("OutputScreen/${questionarioId}")
+                            navController.navigate("OutputScreen/${questionarioId}"){
+                                //con popUpTo cancello tutti gli screen fino ad adesso così evito che l'utente se va indietro non succede nulla
+                                //inclusive dico che anche la prima schermata viene eliminata
+                                popUpTo(0) { inclusive = true }
+                            }
                             //navController.navigate("OutputScreen/${questionarioId}/\${nuovoValore}")
                         }
                     }
