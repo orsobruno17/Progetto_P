@@ -8,8 +8,6 @@ class UtentiRepository(
 //repository fa da intermediario tra ui e il database
     private val dao: UtenteDao
 ) {
-    //Flow<List<ShoppingItem>>. Ogni volta che il database subisce una modifica, la UI viene notificata e aggiornata automaticamente in tempo reale.
-    val items: Flow<List<Utenti>> = dao.getAllItems()
 
     //Prende parametri semplici dalla UI
     //crea l'oggetto Utenti e lo passa al DAO per l'inserimento.
@@ -23,14 +21,6 @@ class UtentiRepository(
                 password = password
             )
         )
-    }
-
-    suspend fun updateItem(item: Utenti) {
-        dao.updateItem(item)
-    }
-
-    suspend fun deleteItem(item: Utenti) {
-        dao.deleteItem(item)
     }
 
     suspend fun getItemByEmail(email: String, password: String): Utenti?{

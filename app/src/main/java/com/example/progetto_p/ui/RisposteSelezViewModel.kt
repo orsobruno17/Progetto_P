@@ -19,10 +19,9 @@ class RisposteSelezViewModel(
     val utenteLog: StateFlow<String?> = sessionManager.codiceFiscaleFlow
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
+            started = SharingStarted.Eagerly,
             initialValue = null
         )
-
     fun salvaRispostaCompilata(compilazioneId: Int, domandaId: Int, punteggio: Int){
             viewModelScope.launch {
                 val rispostaCompil = RispostaSelezionata(

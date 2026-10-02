@@ -51,7 +51,6 @@ abstract class AppDatabase : RoomDatabase() {
                     "utenti_database"
                 )
                     .createFromAsset("database/questionari.db")
-                    //.fallbackToDestructiveMigration() // permette di pulire il db in caso di modifiche allo schema
                     .build()
 
                 INSTANCE = instance

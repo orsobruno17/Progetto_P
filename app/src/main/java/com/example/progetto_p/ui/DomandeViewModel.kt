@@ -19,10 +19,6 @@ class DomandeViewModel (
     private val repository: DomandeRepository
 ): ViewModel(){
 
-
-    //estraggo l'id dall'argomento della navigazione
-    //private val questionarioId: Int = checkNotNull(savedStateHandle.get<Int>("questionarioId"))
-
     fun getDomandeById(questionarioId: Int): Flow<List<Domande>>{
         return repository.getDomandeById(questionarioId)
     }

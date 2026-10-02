@@ -15,7 +15,6 @@ interface CompilazioneDao {
     @Query("SELECT id FROM compilazioneUtente WHERE utenteId = :utenteId AND questionarioId = :questionarioId ORDER BY id DESC LIMIT 1")
     fun getCompl(utenteId: String, questionarioId: Int): Flow<Int>
 
-    //@Query("SELECT COUNT(punteggio) FROM compilazioneUtente c INNER JOIN rispostaSelezionata r ON c.id = r.compilazioneId AND rispostaSelezionata r INNER JOIN opzioniRisposta o ON r.domandaId = o.domandaId")
     @Query("SELECT SUM(o.punteggio) FROM CompilazioneUtente c INNER JOIN RispostaSelezionata r ON c.id = r.compilazioneId INNER JOIN OpzioniRisposta o ON r.opzioneSelezionataId = o.id WHERE c.id = :compilazioneId")
     suspend fun sommaTotPunt(compilazioneId: Int): Int
 

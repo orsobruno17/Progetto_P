@@ -15,5 +15,5 @@ val primary = Color(0xFF009688)
 val tertiary = Color(0xFF93EFDD)
 val testoN = Color(0xFF000000)
 val testoB = Color(0xFFFFFFFF)
-val background = Color(0xFF4F1E00)
+val background = Color(0xFF0518A2)
 

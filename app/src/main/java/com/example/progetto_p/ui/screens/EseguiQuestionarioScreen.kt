@@ -62,7 +62,7 @@ fun EseguiQuestionario(
     viewModelQ: QuestionariViewModel,
     viewModelS: RisposteSelezViewModel,
     viewModelC: CompilazioneViewModel
-){
+) {
     val context = LocalContext.current
 
     val scope = rememberCoroutineScope()
@@ -75,8 +75,9 @@ fun EseguiQuestionario(
 
     //da questo prendo il codice e di conseguenza l'id (forse devo fare una query per farmi ritornare l'id)
     //serve per la tabella compilazione
-    val codiceFiscaleUser by viewModelS.utenteLog.collectAsStateWithLifecycle(initialValue = null)
+    val codiceFiscaleUser by viewModelS.utenteLog.collectAsStateWithLifecycle()
 
+    Log.d("DEBUG_UI", "codiceFiscaleUser attuale: $codiceFiscaleUser")
     if (codiceFiscaleUser == null) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -84,178 +85,207 @@ fun EseguiQuestionario(
         ) {
             CircularProgressIndicator()
         }
-        return
-    }
-    //recupero l'id della compilazione
-    val compilazioneId by viewModelC.getCompl(codiceFiscaleUser!!, questionarioId).collectAsStateWithLifecycle(initialValue = -1)
+    } else {
+        //recupero l'id della compilazione
+        val compilazioneId by viewModelC.getCompl(codiceFiscaleUser!!, questionarioId)
+            .collectAsStateWithLifecycle(initialValue = -1)
 
-    //il LauchedEffect permette di creare la compilazione solo una volta, anche se c'è una ricomposizione
-    LaunchedEffect(codiceFiscaleUser, questionarioId, compilazioneId) {
-        if (compilazioneId == 0) {
-            viewModelC.inserisciCompil(codiceFiscaleUser!!, questionarioId)
+        Log.d("DEBUG_UI", "compilazioneId attuale: $compilazioneId per CF: $codiceFiscaleUser")
+        //il LauchedEffect permette di creare la compilazione solo una volta, anche se c'è una ricomposizione
+        LaunchedEffect(codiceFiscaleUser, questionarioId) {
+            if (compilazioneId <= 0) {
+                viewModelC.inserisciCompil(codiceFiscaleUser!!, questionarioId)
+            }
         }
-    }
 
-    if (compilazioneId <= 0) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            CircularProgressIndicator()
-        }
-        return
-    }
+        if (compilazioneId <= 0) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {Text(text = "Compila Questionario",
-                    fontSize = 50.sp,
-                    color = MaterialTheme.colorScheme.onSecondary)},
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                )
-            )
-        }
-    ) { innerPadding ->
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(innerPadding)
-            .background(MaterialTheme.colorScheme.tertiary)
-        ) {
-            LazyColumn(modifier = Modifier.weight(1f)) {
-                items(domande)
-                { domanda ->
-                    //questo permette di ascoltare il Flow o lo converte in uno State di compose
-                    val risposte by viewModel.risposte(domanda.id)
-                        .collectAsStateWithLifecycle(initialValue = emptyList())
-                    DomandeCard(
-                        domanda = domanda,
-                        risposte = risposte, //SONO LE RISPOSTE POSSIBILI
-                        //serve per verificare quale radiobutton è stato selezionato e viene salvato in memoria
-                        idRispostaSelezionata = risposteSelezionate[domanda.id],
-                        onRispostaSelezionata = { rispostaId ->
-                            risposteSelezionate = risposteSelezionate + (domanda.id to rispostaId)
-                            //QUI GLI PASSO IL VALORE DELLA COMPILAZIONE
-                            if(compilazioneId > 0) {
-                                viewModelS.salvaRispostaCompilata(compilazioneId, domanda.id, rispostaId)
-                            }else{
-                                Log.d("DEBUG", "la compilazione non è ancora avvenuta")
-                            }
+            Scaffold(
+                topBar = {
+                    TopAppBar(
+                        title = {
+                            Text(
+                                text = "Compila Questionario",
+                                fontSize = 50.sp,
+                                color = MaterialTheme.colorScheme.onSecondary
+                            )
+                        },
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    )
+                }
+            ) { innerPadding ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                        .background(MaterialTheme.colorScheme.tertiary)
+                ) {
+                    LazyColumn(modifier = Modifier.weight(1f)) {
+                        items(domande)
+                        { domanda ->
+                            //questo permette di ascoltare il Flow o lo converte in uno State di compose
+                            val risposte by viewModel.risposte(domanda.id)
+                                .collectAsStateWithLifecycle(initialValue = emptyList())
+                            DomandeCard(
+                                domanda = domanda,
+                                risposte = risposte, //SONO LE RISPOSTE POSSIBILI
+                                //serve per verificare quale radiobutton è stato selezionato e viene salvato in memoria
+                                idRispostaSelezionata = risposteSelezionate[domanda.id],
+                                onRispostaSelezionata = { rispostaId ->
+                                    risposteSelezionate =
+                                        risposteSelezionate + (domanda.id to rispostaId)
+                                    //QUI GLI PASSO IL VALORE DELLA COMPILAZIONE
+                                    if (compilazioneId > 0) {
+                                        viewModelS.salvaRispostaCompilata(
+                                            compilazioneId,
+                                            domanda.id,
+                                            rispostaId
+                                        )
+                                    } else {
+                                        Log.d("DEBUG", "la compilazione non è ancora avvenuta")
+                                    }
+                                }
+
+                            )
+
                         }
 
-                    )
 
-                }
+                    }
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Button(
+                            onClick = {
+                                navController.navigate("QuestionarioSelez")
+                            }, modifier = Modifier.height(56.dp)
+                                .defaultMinSize(minWidth = 80.dp)
+                                .padding(start = 7.dp, bottom = 6.dp),
+                            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                MaterialTheme.colorScheme.onBackground
+                            )
+                        ) {
+                            Text(
+                                text = "Indietro",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSecondary
+                            )
+                            Spacer(Modifier.height(4.dp))
+                        }
 
-
-            }
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween) {
-                Button(onClick = {
-                    navController.navigate("QuestionarioSelez")
-                }, modifier = Modifier.height(56.dp)
-                    .defaultMinSize(minWidth = 80.dp)
-                    .padding(start = 7.dp, bottom = 6.dp),
-                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        MaterialTheme.colorScheme.onBackground)) {
-                    Text(text = "Indietro",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSecondary)
-                    Spacer(Modifier.height(4.dp))
-                }
-
-                Button(onClick = {
-                    if (domande.size != risposteSelezionate.size) {
-                        Toast.makeText(context, "Devi rispondere a tutte le domande", Toast.LENGTH_LONG).show()
-                    } else {
-                        //QUI FACCIO LA SOMMA
-                        scope.launch {
-                            val nuovoValore = viewModelC.sommaTotPunt(compilazioneId)
-                            Log.d("DEBUG","LA SOMMA VALE ${nuovoValore}")
-                            //INSERISCO IL TOTALE IN compilazioneUtente punteggio tot
-                            viewModelC.aggiornaPunteggioT(nuovoValore, compilazioneId)
-                            navController.navigate("OutputScreen/${questionarioId}"){
-                                //con popUpTo cancello tutti gli screen fino ad adesso così evito che l'utente se va indietro non succede nulla
-                                //inclusive dico che anche la prima schermata viene eliminata
-                                popUpTo(0) { inclusive = true }
-                            }
-                            //navController.navigate("OutputScreen/${questionarioId}/\${nuovoValore}")
+                        Button(
+                            onClick = {
+                                if (domande.size != risposteSelezionate.size) {
+                                    Toast.makeText(
+                                        context,
+                                        "Devi rispondere a tutte le domande",
+                                        Toast.LENGTH_LONG
+                                    ).show()
+                                } else {
+                                    //QUI FACCIO LA SOMMA
+                                    scope.launch {
+                                        val nuovoValore = viewModelC.sommaTotPunt(compilazioneId)
+                                        Log.d("DEBUG", "LA SOMMA VALE ${nuovoValore}")
+                                        //INSERISCO IL TOTALE IN compilazioneUtente punteggio tot
+                                        viewModelC.aggiornaPunteggioT(nuovoValore, compilazioneId)
+                                        navController.navigate("OutputScreen/${questionarioId}") {
+                                            //con popUpTo cancello tutti gli screen fino ad adesso così evito che l'utente se va indietro non succede nulla
+                                            //inclusive dico che anche la prima schermata viene eliminata
+                                            popUpTo(0) { inclusive = true }
+                                        }
+                                        //navController.navigate("OutputScreen/${questionarioId}/\${nuovoValore}")
+                                    }
+                                }
+                            }, modifier = Modifier.height(56.dp)
+                                .padding(end = 7.dp, bottom = 6.dp)
+                                .defaultMinSize(minWidth = 80.dp),
+                            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                MaterialTheme.colorScheme.onBackground
+                            )
+                        ) {
+                            Text(
+                                text = "Fine",
+                                style = MaterialTheme.typography.labelLarge,
+                                color = MaterialTheme.colorScheme.onSecondary
+                            )
+                            Spacer(Modifier.height(4.dp))
                         }
                     }
-                }, modifier = Modifier.height(56.dp)
-                    .padding(end = 7.dp, bottom = 6.dp)
-                    .defaultMinSize(minWidth = 80.dp),
-                    contentPadding = PaddingValues(horizontal = 24.dp, vertical = 12.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        MaterialTheme.colorScheme.onBackground)) {
-                    Text(text = "Fine",
-                        style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.onSecondary)
-                    Spacer(Modifier.height(4.dp))
                 }
+
             }
-    }
+        }
+
+    }}
 
 
-}
+    @Composable
+    fun DomandeCard(
+        domanda: Domande,
+        risposte: List<OpzioniRisposta>,
+        idRispostaSelezionata: Int?,
+        onRispostaSelezionata: (Int) -> Unit
 
-}
+    ) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primary
+            ),
+            border = BorderStroke(10.dp, MaterialTheme.colorScheme.onBackground),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Text(
+                    text = domanda.testo,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSecondary
+                )
+                Spacer(modifier = Modifier.height(12.dp))
 
-
-@Composable
-fun DomandeCard(
-    domanda: Domande,
-    risposte: List<OpzioniRisposta>,
-    idRispostaSelezionata: Int?,
-    onRispostaSelezionata: (Int) -> Unit
-
-    ){
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .padding(horizontal = 16.dp, vertical = 8.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primary
-        ),
-        border = BorderStroke(10.dp, MaterialTheme.colorScheme.onBackground),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ){
-        Column(
-            modifier = Modifier.padding(16.dp)
-        ){
-            Text(
-                text = domanda.testo,
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSecondary
-            )
-            Spacer(modifier = Modifier.height(12.dp))
-
-            risposte.forEach { risposta ->
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        //l'utente seleziona la risposta
-                        .clickable { onRispostaSelezionata(risposta.id) }
-                        .padding(vertical = 4.dp)
-                ){
-                    RadioButton(
-                        selected = (risposta.id == idRispostaSelezionata),
-                        onClick = null,
-                        colors = RadioButtonDefaults.colors( selectedColor = MaterialTheme.colorScheme.secondary,
-                            disabledSelectedColor = MaterialTheme.colorScheme.primary)
-                    )
-                    Text(
-                        text = risposta.testo,
-                        modifier = Modifier.padding(start = 8.dp),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSecondary
-                    )
+                risposte.forEach { risposta ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            //l'utente seleziona la risposta
+                            .clickable { onRispostaSelezionata(risposta.id) }
+                            .padding(vertical = 4.dp)
+                    ) {
+                        RadioButton(
+                            selected = (risposta.id == idRispostaSelezionata),
+                            onClick = null,
+                            colors = RadioButtonDefaults.colors(
+                                selectedColor = MaterialTheme.colorScheme.secondary,
+                                disabledSelectedColor = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                        Text(
+                            text = risposta.testo,
+                            modifier = Modifier.padding(start = 8.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSecondary
+                        )
+                    }
                 }
             }
         }
     }
-}
